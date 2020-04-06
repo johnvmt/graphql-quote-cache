@@ -2,7 +2,7 @@ import os from "os";
 import cluster from "cluster";
 import GraphQLHTTPServer from "graphql-http-ws-server";
 import quoteCacheSchema from "./schemas/quoteCacheSchema";
-import { RedisDBCollection, PouchDBCollection, LocalDBCollection } from "quote-cache";
+import cacheCollection from "quote-cache";
 
 export default (config) => {
 	const workers = config.hasOwnProperty('workers') ? config.workers : os.cpus().length;
@@ -23,17 +23,10 @@ export default (config) => {
 			if(config.collections.hasOwnProperty(collectionKey)) {
 				const collectionConfig = config.collections[collectionKey];
 
-				if(collectionConfig.type === 'redis')
-					collections.set(collectionKey, new RedisDBCollection(collectionConfig.hasOwnProperty('options') ? collectionConfig.options : {}));
-				else if(collectionConfig.type === 'pouchdb')
-					collections.set(collectionKey, new PouchDBCollection(collectionConfig.hasOwnProperty('options') ? collectionConfig.options : {}));
-				else if(collectionConfig.type === 'local') {
-					if(workers > 1)
-						throw new Error(`Running local collection with more than one worker thread`);
-					collections.set(collectionKey, new LocalDBCollection());
-				}
-				else
-					throw new Error(`Unknown collection type '${collectionConfig.type}' in '${collectionKey}'`);
+				if(collectionConfig.type.toLowerCase() === 'local' && workers > 1)
+					throw new Error(`Running local collection with more than one worker thread`);
+
+				collections.set(collectionKey, cacheCollection(collectionConfig));
 
 				// Set default collection to be first valid collection, if not already set
 				if(defaultCollection === null)
