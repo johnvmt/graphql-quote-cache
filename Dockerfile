@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM nikolaik/python-nodejs:latest
 
 WORKDIR /usr/src/app
 

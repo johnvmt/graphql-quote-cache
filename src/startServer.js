@@ -1,9 +1,8 @@
 import os from "os";
 import cluster from "cluster";
 import GraphQLHTTPServer from "graphql-http-ws-server";
-import quoteCacheSchema from "./quoteCacheSchema";
-import RedisDBCollection from "./RedisDBCollection";
-import LocalDBCollection from "./LocalDBCollection";
+import quoteCacheSchema from "./schemas/quoteCacheSchema";
+import { RedisDBCollection, PouchDBCollection, LocalDBCollection } from "quote-cache";
 
 export default (config) => {
 	const workers = config.hasOwnProperty('workers') ? config.workers : os.cpus().length;
@@ -26,13 +25,15 @@ export default (config) => {
 
 				if(collectionConfig.type === 'redis')
 					collections.set(collectionKey, new RedisDBCollection(collectionConfig.hasOwnProperty('options') ? collectionConfig.options : {}));
+				else if(collectionConfig.type === 'pouchdb')
+					collections.set(collectionKey, new PouchDBCollection(collectionConfig.hasOwnProperty('options') ? collectionConfig.options : {}));
 				else if(collectionConfig.type === 'local') {
 					if(workers > 1)
-						throw new Error(`Running local collection with more than one worker thread`)
+						throw new Error(`Running local collection with more than one worker thread`);
 					collections.set(collectionKey, new LocalDBCollection());
 				}
 				else
-					throw new Error(`Unknown collection type '${collectionConfig.type}' in '${collectionKey}'`)
+					throw new Error(`Unknown collection type '${collectionConfig.type}' in '${collectionKey}'`);
 
 				// Set default collection to be first valid collection, if not already set
 				if(defaultCollection === null)

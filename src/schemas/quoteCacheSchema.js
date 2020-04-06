@@ -4,7 +4,7 @@ import EventEmitterAsyncIterator from 'event-emitter-async-iterator';
 import GraphQLObjectType from "./GraphQLObjectType";
 import GraphQLObjectOrPrimitiveType from "./GraphQLObjectOrPrimitiveType";
 import GraphQLUnknownScalarType from "./GraphQLUnknownScalarType";
-import DBCollection from "./DBCollection";
+import { DBCollection } from "quote-cache";
 
 export default (collections, defaultCollectionID) => {
 
@@ -361,8 +361,6 @@ export default (collections, defaultCollectionID) => {
 					const sanitizedArgs = sanitizeSetItemInput(args);
 					const itemSubscription = collections.get(sanitizedArgs.collectionID).subscribeItem(sanitizedArgs.itemID);
 					const asyncIterator = new EventEmitterAsyncIterator();
-
-					// TODO add get
 
 					itemSubscription.on('mutation', (mutationType, itemID, itemType, itemValue) => {
 

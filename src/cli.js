@@ -6,7 +6,7 @@ import https from "https";
 import fetch from "node-fetch";
 import commandLineArgs from "command-line-args";
 import commandLineUsage from "command-line-usage";
-import startServer from "./src/startServer";
+import startServer from "./startServer";
 
 const commandOptions = [
 	{ name: 'config', alias: 'c', description: 'Configuration file or URL', type: String, defaultOption: true},
@@ -14,7 +14,7 @@ const commandOptions = [
 	{ name: 'help', alias: 'h', description: 'Display this help', type: Boolean}
 ];
 
-const configDefaultFile = path.join(__dirname, 'config.json');
+const configDefaultFile = path.join(__dirname, '..', 'config.json');
 
 const configDefaults = {
 	debug: true
